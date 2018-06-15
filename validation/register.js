@@ -9,14 +9,14 @@ module.exports = function validateRegisterInput(data) {
     data.password2 = !isEmpty(data.password2) ? data.password2 : '';
     console.log(data)
     //name validation
-    if (!validator.isEmpty(data.name)) {
-        errors.name = 'Name field is required';
-    }
     if (!validator.isLength(data.name, {
             min: 2,
             max: 50
         })) {
         errors.name = 'Name must be between 2 and 50 characters';
+    }
+    if (!validator.isEmpty(data.name)) {
+        errors.name = 'Name field is required';
     }
 
     // email validation

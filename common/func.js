@@ -4,11 +4,18 @@ module.exports = {
             return fn(...args).catch(err => console.log(err));
         }
     },
-    isEmpty: (data) => {
-        console.log('here ', data)
-        return data === null ||
-            data === undefined ||
-            (typeof (data) == 'obj') && Object.keys(data).length === 0 ||
-            (typeof (data) == 'string') && data.trim().length === 0
+    isEmpty: value => {
+        console.log(value)
+        console.log(typeof value)
+        if (typeof value === 'string') {
+
+            console.log('if', value.trim().length)
+        }
+        const res = value === undefined ||
+            value === null ||
+            (typeof value === 'object' && Object.keys(value).length === 0) ||
+            (typeof value === 'string' && value.trim().length === 0)
+        console.log('res', res)
+        return res;
     }
 }
