@@ -7,48 +7,44 @@ module.exports = function validateRegisterInput(data) {
     data.email = !isEmpty(data.email) ? data.email : '';
     data.password = !isEmpty(data.password) ? data.password : '';
     data.password2 = !isEmpty(data.password2) ? data.password2 : '';
-    console.log(data)
+
     //name validation
     if (!validator.isLength(data.name, {
-            min: 2,
-            max: 50
-        })) {
+        min: 2,
+        max: 50
+    })) {
         errors.name = 'Name must be between 2 and 50 characters';
     }
-    if (!validator.isEmpty(data.name)) {
+    if (validator.isEmpty(data.name)) {
         errors.name = 'Name field is required';
     }
 
     // email validation
-    if (!validator.isEmpty(data.email)) {
-        errors.email = 'Email field is required';
-    }
     if (!validator.isEmail(data.email)) {
         errors.email = 'Email is invalid';
     }
+    if (validator.isEmpty(data.email)) {
+        errors.email = 'Email field is required';
+    }
 
     // password validation
-    if (!validator.isEmpty(data.password)) {
-        errors.password = 'Password field is required';
-    }
     if (!validator.isLength(data.password, {
-            min: 8,
-            max: 50
-        })) {
+        min: 8,
+        max: 50
+    })) {
         errors.password = 'Password must be between 8 and 50 characters';
+    }
+    if (validator.isEmpty(data.password)) {
+        errors.password = 'Password field is required';
     }
 
     // confirm password validation
-    console.log('here 11 ', typeof (data.password2))
-    if (!validator.isEmpty(data.password2)) {
-        console.log('111')
-        errors.password2 = 'Confirm password field is required';
-    }
     if (!validator.equals(data.password, data.password2)) {
-        console.log('222')
         errors.password2 = 'Passwords must match';
     }
-    console.log('333')
+    if (validator.isEmpty(data.password2)) {
+        errors.password2 = 'Confirm password field is required';
+    }
 
     return {
         errors,
