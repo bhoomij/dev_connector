@@ -10,6 +10,7 @@ const User = require('../../models/User');
 const secretOrKey = require('../../config/keys').secretOrKey;
 const common = require('../../common/func');
 const validateRegisterInput = require('../../validation/register');
+const validateLoginInput = require('../../validation/login');
 
 const router = express.Router();
 
@@ -74,6 +75,16 @@ router.post('/register', common.catchErrors(async (req, res) => {
 // @desc    Login with email, password and get JWT
 // @access  Public
 router.post('/login', common.catchErrors(async (req, res) => {
+    const {
+        errors,
+        isValid,
+    } = validateLoginInput(req.body);
+
+    // Input validation
+    if (!isValid) {
+        return res.status(400).json(errors);
+    }
+
     let {
         email,
         password
@@ -84,16 +95,14 @@ router.post('/login', common.catchErrors(async (req, res) => {
     });
     // user not found
     if (!user) {
-        return res.status(404).json({
-            user: 'User not found'
-        });
+        errors.email = 'User not found';
+        return res.status(404).json(errors);
     }
     // check for password
     const isMatch = await brcrypt.compare(password, user.password);
     if (!isMatch) {
-        return res.status(400).json({
-            password: 'Incorrect password'
-        });
+        errors.password = 'Incorrect password'
+        return res.status(400).json(errors);
     }
     // password matched
     let payload = {
