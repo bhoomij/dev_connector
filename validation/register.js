@@ -7,12 +7,11 @@ module.exports = function validateRegisterInput(data) {
     data.email = !isEmpty(data.email) ? data.email : '';
     data.password = !isEmpty(data.password) ? data.password : '';
     data.password2 = !isEmpty(data.password2) ? data.password2 : '';
-
     //name validation
     if (!validator.isLength(data.name, {
-        min: 2,
-        max: 50
-    })) {
+            min: 2,
+            max: 50
+        })) {
         errors.name = 'Name must be between 2 and 50 characters';
     }
     if (validator.isEmpty(data.name)) {
@@ -29,9 +28,9 @@ module.exports = function validateRegisterInput(data) {
 
     // password validation
     if (!validator.isLength(data.password, {
-        min: 8,
-        max: 50
-    })) {
+            min: 8,
+            max: 50
+        })) {
         errors.password = 'Password must be between 8 and 50 characters';
     }
     if (validator.isEmpty(data.password)) {

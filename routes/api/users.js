@@ -25,7 +25,6 @@ router.get('/test', (req, res) => res.json({
 // @desc    Register user
 // @access  Public
 router.post('/register', common.catchErrors(async (req, res) => {
-
     const {
         errors,
         isValid,
