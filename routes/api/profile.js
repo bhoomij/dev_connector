@@ -196,7 +196,8 @@ router.post('/experience',
 // @route   POST /api/profile/education
 // @desc    Save user education details
 // @access  Private
-router.post('/education',
+router.post(
+    '/education',
     passport.authenticate('jwt', {
         session: false
     }), common.catchErrors(async (req, res) => {
@@ -228,6 +229,73 @@ router.post('/education',
         profile.education.unshift(newEdu);
         const result = await profile.save();
         res.json(result);
-    }));
+    })
+);
+
+// @route   DELETE /api/profile/experience
+// @desc    Delete experience from profile
+// @access  Private
+router.delete(
+    '/experience/:id',
+    passport.authenticate('jwt', {
+        session: false
+    }), common.catchErrors(async (req, res) => {
+        const profile = await Profile.findOne({
+            user: req.user.id
+        });
+        if (!profile) {
+            errors.profile = 'There is no profile for this user';
+            res.status(404).json(errors);
+        }
+        removeIndex = profile.experience.findIndex(exp => exp.id == req.params.id)
+        profile.experience.splice(removeIndex, 1);
+        const result = await profile.save();
+        res.json(result);
+    })
+);
+
+// @route   DELETE /api/profile/education
+// @desc    Delete education from profile
+// @access  Private
+router.delete(
+    '/education/:id',
+    passport.authenticate('jwt', {
+        session: false
+    }), common.catchErrors(async (req, res) => {
+        const profile = await Profile.findOne({
+            user: req.user.id
+        });
+        if (!profile) {
+            errors.profile = 'There is no profile for this user';
+            res.status(404).json(errors);
+        }
+        removeIndex = profile.education.findIndex(edu => edu.id == req.params.id)
+        profile.education.splice(removeIndex, 1);
+        const result = await profile.save();
+        res.json(result);
+    })
+);
+
+// @route   DELETE /api/profile
+// @desc    Delete profile and user
+// @access  Private
+router.delete(
+    '/',
+    passport.authenticate('jwt', {
+        session: false
+    }), common.catchErrors(async (req, res) => {
+        const profile = await Profile.findOneAndRemove({
+            user: req.user.id
+        });
+        const user = await User.findByIdAndRemove(req.user.id);
+        if (!user) {
+            errors.user = 'No user found';
+            return res.status(404).json(errors);
+        }
+        res.json({
+            success: true
+        });
+    })
+);
 
 module.exports = router;

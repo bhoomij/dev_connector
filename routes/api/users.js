@@ -109,7 +109,6 @@ router.post('/login', common.catchErrors(async (req, res) => {
         email: user.email,
         avatar: user.avatar
     };
-    console.log(payload)
     // get token
     const token = await jwt.sign(payload, secretOrKey, {
         expiresIn: 3600 * 24
