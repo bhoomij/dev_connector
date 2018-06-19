@@ -9,7 +9,7 @@ module.exports = function validateProfileInput(data) {
     data.skills = !isEmpty(data.skills) ? data.skills : '';
 
     // handle validation
-    if (validator.isLength(data.handle, {
+    if (!validator.isLength(data.handle, {
             min: 2,
             max: 40,
         }))
