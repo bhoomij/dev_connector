@@ -7,6 +7,8 @@ const User = require('../../models/User');
 const Profile = require('../../models/Profile');
 const common = require('../../common/func');
 const validateProfileInput = require('../../validation/profile');
+const validateExperienceInput = require('../../validation/experience');
+const validateEducationInput = require('../../validation/education');
 
 const router = express.Router();
 
@@ -152,6 +154,80 @@ router.get('/all',
             return res.status(404).send(errors)
         }
         res.send(profiles);
+    }));
+
+// @route   POST /api/profile/experience
+// @desc    Save user experience details
+// @access  Private
+router.post('/experience',
+    passport.authenticate('jwt', {
+        session: false
+    }), common.catchErrors(async (req, res) => {
+        // Input validation
+        const {
+            errors,
+            isValid,
+        } = validateExperienceInput(req.body);
+        if (!isValid) {
+            return res.status(400).json(errors);
+        }
+        newExp = {
+            title: req.body.title,
+            company: req.body.company,
+            description: req.body.description,
+            from: req.body.from,
+            to: req.body.to,
+            location: req.body.location,
+            current: req.body.current,
+        }
+        const profile = await Profile.findOne({
+            user: req.user.id
+        });
+        if (!profile) {
+            errors.profile = 'There is not profile for this user';
+            res.status(404).json(errors);
+        }
+        // Add to exp array
+        profile.experience.unshift(newExp);
+        const result = await profile.save();
+        res.json(result);
+    }));
+
+// @route   POST /api/profile/education
+// @desc    Save user education details
+// @access  Private
+router.post('/education',
+    passport.authenticate('jwt', {
+        session: false
+    }), common.catchErrors(async (req, res) => {
+        // Input validation
+        const {
+            errors,
+            isValid,
+        } = validateEducationInput(req.body);
+        if (!isValid) {
+            return res.status(400).json(errors);
+        }
+        newEdu = {
+            school: req.body.school,
+            degree: req.body.degree,
+            fieldofstudy: req.body.fieldofstudy,
+            from: req.body.from,
+            to: req.body.to,
+            current: req.body.current,
+            description: req.body.description
+        }
+        const profile = await Profile.findOne({
+            user: req.user.id
+        });
+        if (!profile) {
+            errors.profile = 'There is no profile for this user';
+            res.status(404).json(errors);
+        }
+        // Add to exp array
+        profile.education.unshift(newEdu);
+        const result = await profile.save();
+        res.json(result);
     }));
 
 module.exports = router;
