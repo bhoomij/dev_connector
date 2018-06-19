@@ -26,7 +26,7 @@ router.get('/',
         const profile = await Profile.findOne({
             user: req.user.id
         }).populate('users', ['name', 'avatar']);
-        if (profile) {
+        if (!profile) {
             errors.profile = 'There is not profile for this user'
             res.status(404).send(errors)
         }
@@ -96,11 +96,62 @@ router.post('/',
         })
         if (profile) {
             errors.handle = 'That handle is already taken';
-            res.status(400).json(error);
+            res.status(400).json(errors);
         }
         profile = new Profile(profileFields).save()
         res.json(profile);
 
-    }))
+    }));
+
+// @route   GET /api/profile/handle/:handle
+// @desc    Get profile
+// @access  Public
+router.get('/handle/:handle',
+    common.catchErrors(async (req, res) => {
+        errors = {};
+        const profile = await Profile.findOne({
+            handle: req.params.handle
+        }).populate('users', ['name', 'avatar']);
+        if (!profile) {
+            errors.profile = 'There is not profile for this handle'
+            return res.status(404).send(errors)
+        }
+        res.send(profile);
+    }));
+
+// @route   GET /api/profile/user/:id
+// @desc    Get profile
+// @access  Public
+router.get('/user/:id',
+    async (req, res) => {
+        errors = {};
+        try {
+            const profile = await Profile.findOne({
+                user: req.params.id
+            }).populate('users', ['name', 'avatar']);
+            if (!profile) {
+                errors.profile = 'There is no profile for this user'
+                return res.status(404).send(errors)
+            }
+            res.send(profile);
+        } catch (err) {
+            errors.profile = 'There is no profile for this user'
+            return res.status(404).send(errors)
+        }
+    });
+
+// @route   GET /api/profile/all
+// @desc    Get all profiles
+// @access  Public
+router.get('/all',
+    common.catchErrors(async (req, res) => {
+        errors = {};
+        const profiles = await Profile.find().populate('users', ['name', 'avatar']);
+        if (!profiles) {
+            errors.profile = 'There are no profiles'
+            return res.status(404).send(errors)
+        }
+        res.send(profiles);
+    }));
 
 module.exports = router;
