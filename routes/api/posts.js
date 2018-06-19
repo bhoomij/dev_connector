@@ -76,7 +76,7 @@ router.post('/', passport.authenticate('jwt', {
     res.json(post);
 }));
 
-// @route   DELTE /api/post/:id
+// @route   DELETE /api/post/:id
 // @desc    Delete post
 // @access  Public
 router.delete('/:id', passport.authenticate('jwt', {
@@ -97,6 +97,59 @@ router.delete('/:id', passport.authenticate('jwt', {
         res.json({
             success: true
         });
+    } catch (err) {
+        errors.post = 'Post not found';
+        return res.status(404).json(errors);
+    }
+});
+
+// @route   /api/post/like/:id
+// @desc    Like post
+// @access  Private
+router.post('/like/:id', passport.authenticate('jwt', {
+    session: false
+}), async (req, res) => {
+    try {
+        errors = {};
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+            errors.post = 'Post not found';
+            return res.status(404).json(errors);
+        }
+        if (post.likes.some(user => user._id == req.user.id)) {
+            errors.post = 'You have already liked the post';
+            return res.status(404).json(errors);
+        }
+        post.likes.unshift(req.user.id);
+        const result = await post.save();
+        res.json(result);
+    } catch (err) {
+        errors.post = 'Post not found';
+        return res.status(404).json(errors);
+    }
+});
+
+// @route   /api/post/unlike/:id
+// @desc    Unlike post
+// @access  Private
+router.post('/unlike/:id', passport.authenticate('jwt', {
+    session: false
+}), async (req, res) => {
+    try {
+        errors = {};
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+            errors.post = 'Post not found';
+            return res.status(404).json(errors);
+        }
+        const removeIndex = post.likes.findIndex(user => user._id == req.user.id)
+        if (removeIndex < 0) {
+            errors.post = 'You have not liked the post';
+            return res.status(404).json(errors);
+        };
+        post.likes.splice(removeIndex, 1);
+        const result = await post.save();
+        res.json(result);
     } catch (err) {
         errors.post = 'Post not found';
         return res.status(404).json(errors);
