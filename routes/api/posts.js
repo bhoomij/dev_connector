@@ -76,7 +76,7 @@ router.post('/', passport.authenticate('jwt', {
     res.json(post);
 }));
 
-// @route   DELETE /api/post/:id
+// @route   DELETE /api/posts/:id
 // @desc    Delete post
 // @access  Public
 router.delete('/:id', passport.authenticate('jwt', {
@@ -103,7 +103,7 @@ router.delete('/:id', passport.authenticate('jwt', {
     }
 });
 
-// @route   /api/post/like/:id
+// @route   /api/posts/like/:id
 // @desc    Like post
 // @access  Private
 router.post('/like/:id', passport.authenticate('jwt', {
@@ -129,7 +129,7 @@ router.post('/like/:id', passport.authenticate('jwt', {
     }
 });
 
-// @route   /api/post/unlike/:id
+// @route   /api/posts/unlike/:id
 // @desc    Unlike post
 // @access  Private
 router.post('/unlike/:id', passport.authenticate('jwt', {
@@ -148,6 +148,72 @@ router.post('/unlike/:id', passport.authenticate('jwt', {
             return res.status(404).json(errors);
         };
         post.likes.splice(removeIndex, 1);
+        const result = await post.save();
+        res.json(result);
+    } catch (err) {
+        errors.post = 'Post not found';
+        return res.status(404).json(errors);
+    }
+});
+
+// @route   POST /api/posts/comment/:id
+// @desc    Add comment to post
+// @access  Private
+router.post('/comment/:id', passport.authenticate('jwt', {
+    session: false
+}), async (req, res) => {
+    try {
+        const {
+            errors,
+            isValid
+        } = validatePostInput(req.body);
+        if (!isValid) {
+            return res.status(400).json(errors);
+        }
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+            errors.post = 'Post not found';
+            return res.status(404).json(errors);
+        }
+        newComment = {
+            text: req.body.text,
+            name: req.body.name,
+            avatar: req.body.avatar,
+            user: req.user.id,
+        }
+        post.comments.unshift(newComment);
+        const result = await post.save();
+        res.json(result);
+    } catch (err) {
+        errors = {};
+        errors.post = 'Post not found';
+        return res.status(404).json(errors);
+    }
+});
+
+// @route   DELETE /api/posts/comment/:id
+// @desc    Delete comment from post
+// @access  Private
+router.delete('/comment/:id/:commentId', passport.authenticate('jwt', {
+    session: false
+}), async (req, res) => {
+    errors = {};
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) {
+            errors.post = 'Post not found';
+            return res.status(404).json(errors);
+        }
+        const removeIndex = post.comments.findIndex(comment => comment._id == req.params.commentId)
+        if (removeIndex < 0) {
+            errors.comment = 'Comment not found';
+            return res.status(404).json(errors);
+        }
+        if (post.comments[removeIndex].user != req.user.id) {
+            errors.comment = 'Not authorized to delete comment';
+            return res.status(404).json(errors);
+        }
+        post.comments.splice(removeIndex, 1);
         const result = await post.save();
         res.json(result);
     } catch (err) {
