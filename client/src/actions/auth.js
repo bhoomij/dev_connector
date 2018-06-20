@@ -7,7 +7,7 @@ import { GET_ERRORS, SET_CURRENT_USER } from './types';
 export const registerUser = (userData, history) => dispatch => {
     axios
         .post('/api/users/register', userData)
-        .then(res=>history.push('/login'))
+        .then(res => history.push('/login'))
         .catch(err =>
             dispatch({
                 type: GET_ERRORS,
@@ -27,9 +27,9 @@ export const setCurrentUser = (decoded) => {
 export const loginUser = (userData) => dispatch => {
     axios
         .post('/api/users/login', userData)
-        .then(res=> {
+        .then(res => {
             console.log(res.data);
-            const {token} = res.data;
+            const { token } = res.data;
             // Save token
             localStorage.setItem('jwtToken', token);
             // Set header
@@ -45,3 +45,13 @@ export const loginUser = (userData) => dispatch => {
             })
         );
 };
+
+// Log user out
+export const logoutUser = () => dispatch => {
+    // remove token
+    localStorage.removeItem('jwtToken');
+    // remove auth header from future axios requests
+    setAuthHeader(false);
+    // set current user to {}
+    dispatch(setCurrentUser({}));
+}
