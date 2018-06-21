@@ -29,8 +29,8 @@ router.get('/',
             user: req.user.id
         }).populate('users', ['name', 'avatar']);
         if (!profile) {
-            errors.profile = 'There is not profile for this user'
-            res.status(404).send(errors)
+            errors.profile = 'There is no profile for this user'
+            return res.status(404).send(errors)
         }
         res.send(profile);
     }))
@@ -85,10 +85,10 @@ router.post('/',
             const profile = await Profile.findOneAndUpdate({
                 user: req.user.id
             }, {
-                $set: profileFields
-            }, {
-                new: true
-            })
+                    $set: profileFields
+                }, {
+                    new: true
+                })
             return res.json(profile);
         }
 
@@ -115,7 +115,7 @@ router.get('/handle/:handle',
             handle: req.params.handle
         }).populate('users', ['name', 'avatar']);
         if (!profile) {
-            errors.profile = 'There is not profile for this handle'
+            errors.profile = 'There is no profile for this handle'
             return res.status(404).send(errors)
         }
         res.send(profile);
