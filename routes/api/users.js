@@ -107,7 +107,8 @@ router.post('/login', common.catchErrors(async (req, res) => {
     let payload = {
         id: user.id,
         email: user.email,
-        avatar: user.avatar
+        avatar: user.avatar,
+        name: user.name,
     };
     // get token
     const token = await jwt.sign(payload, secretOrKey, {
