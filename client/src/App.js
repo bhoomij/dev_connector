@@ -11,6 +11,7 @@ import Landing from './components/layout/Landing';
 import Register from './components/auth/Register';
 import Login from './components/auth/Login';
 import Dashboard from './components/dashboard/Dashboard';
+import CreateProfile from './components/create-profile/CreateProfile';
 import setAuthToken from './utils/setAuthToken';
 import { setCurrentUser, logoutUser } from './actions/auth';
 import { clearCurrentProfile } from './actions/profile';
@@ -49,6 +50,7 @@ class App extends Component {
               <Route path="/login" exact component={Login} />
               <Switch>
                 <PrivateRoute path="/dashboard" exact component={Dashboard} />
+                <PrivateRoute path="/create-profile" exact component={CreateProfile} />
               </Switch>
             </div>
             <Footer />
